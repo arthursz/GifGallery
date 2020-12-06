@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -11,4 +11,13 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/gif" />
 
-</RelativeLayout>
+    <ImageView
+        android:id="@+id/favorite_button"
+        android:layout_width="@dimen/fav_icon_size"
+        android:layout_height="@dimen/fav_icon_size"
+        android:layout_margin="@dimen/fav_icon_margin"
+        android:layout_gravity="end"
+        android:src="@drawable/favorite_selector"
+        android:contentDescription="@string/favorite"/>
+
+</FrameLayout>

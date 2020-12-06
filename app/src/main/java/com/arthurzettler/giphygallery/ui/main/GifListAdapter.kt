@@ -17,6 +17,7 @@ class GifListAdapter(
 
     class ViewHolder(gifView: View) : RecyclerView.ViewHolder(gifView) {
         var gifContainerView: ImageView = gifView.findViewById(R.id.gif_container)
+        var gifFavoriteButton: ImageView = gifView.findViewById(R.id.favorite_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,6 +31,8 @@ class GifListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val gifUrl = gifList[position].url
+
+        holder.gifFavoriteButton.setOnClickListener { view -> view?.isSelected = view?.isSelected?.not() ?: false } // TODO View is being selected randomly
 
         Glide.with(context)
             .asGif()

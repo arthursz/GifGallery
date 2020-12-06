@@ -8,7 +8,6 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.lang.Exception
 
-
 class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): GifDataSource {
 
     override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) {

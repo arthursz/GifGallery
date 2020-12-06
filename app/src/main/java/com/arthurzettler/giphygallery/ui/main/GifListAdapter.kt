@@ -34,7 +34,7 @@ class GifListAdapter(
         Glide.with(context)
             .asGif()
             .load(gifUrl)
-            .placeholder(android.R.drawable.stat_sys_download)
+            .placeholder(R.drawable.ic_animated_progress_indicator)
             .into(holder.gifContainerView)
     }
 }

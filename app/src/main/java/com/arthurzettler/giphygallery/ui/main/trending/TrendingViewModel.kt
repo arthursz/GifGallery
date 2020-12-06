@@ -3,12 +3,12 @@ package com.arthurzettler.giphygallery.ui.main.trending
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.arthurzettler.giphygallery.data.Result
 import com.arthurzettler.giphygallery.data.Gif
 import com.arthurzettler.giphygallery.data.source.GifRepository
 import com.arthurzettler.giphygallery.data.source.GifRepositoryImpl
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -19,7 +19,7 @@ class TrendingViewModel(private val repository: GifRepository = GifRepositoryImp
     private val internalHasError = MutableLiveData(false)
     val hasError: LiveData<Boolean> = internalHasError
 
-    fun load() = GlobalScope.launch {
+    fun load() = viewModelScope.launch {
         internalHasError.setValueOnUiThread(false)
 
         when (val result = repository.getTrendingGifs()) {

@@ -12,7 +12,8 @@ import com.bumptech.glide.Glide
 
 class GifListAdapter(
         private val context: Context,
-        private val gifList: List<Gif>
+        private val gifList: List<Gif>,
+        private val interaction: GifListInteraction
 ) : RecyclerView.Adapter<GifListAdapter.ViewHolder>() {
 
     class ViewHolder(gifView: View) : RecyclerView.ViewHolder(gifView) {
@@ -30,13 +31,16 @@ class GifListAdapter(
     override fun getItemCount() = gifList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val gifUrl = gifList[position].url
+        val gif = gifList[position]
 
-        holder.gifFavoriteButton.setOnClickListener { view -> view?.isSelected = view?.isSelected?.not() ?: false } // TODO View is being selected randomly
+        holder.gifFavoriteButton.isSelected = gif.isFavorited
+        holder.gifFavoriteButton.setOnClickListener { view ->
+            interaction.onGifFavoriteStatusChanged(position, view?.isSelected?.not() ?: false)
+        }
 
         Glide.with(context)
             .asGif()
-            .load(gifUrl)
+            .load(gif.url)
             .placeholder(R.drawable.ic_animated_progress_indicator)
             .into(holder.gifContainerView)
     }

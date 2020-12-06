@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +15,9 @@ import com.arthurzettler.giphygallery.R
 import com.arthurzettler.giphygallery.data.Gif
 import com.arthurzettler.giphygallery.ui.main.DefaultFragmentCreator
 import com.arthurzettler.giphygallery.ui.main.GifListAdapter
+import com.arthurzettler.giphygallery.ui.main.GifListInteraction
 
-class TrendingFragment : Fragment() {
+class TrendingFragment : Fragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressIndicatorView: ProgressBar
@@ -45,12 +45,17 @@ class TrendingFragment : Fragment() {
         loadGifList()
     }
 
+    override fun onGifFavoriteStatusChanged(position: Int, isFavorite: Boolean) {
+        gifList[position].isFavorited = isFavorite
+        recyclerView.adapter?.notifyItemChanged(position)
+    }
+
     private fun setupView(view: View) {
         errorView = view.findViewById(R.id.error_layout)
         progressIndicatorView = view.findViewById(R.id.progress_indicator)
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GifListAdapter(context, gifList)
+            adapter = GifListAdapter(context, gifList, this@TrendingFragment)
         }
         retryButton = view.findViewById<Button>(R.id.retry_button).apply {
             setOnClickListener { loadGifList() }

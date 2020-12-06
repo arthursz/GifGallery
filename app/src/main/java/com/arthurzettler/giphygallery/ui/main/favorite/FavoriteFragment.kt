@@ -12,11 +12,6 @@ import com.arthurzettler.giphygallery.ui.main.trending.TrendingViewModel
 
 class FavoriteFragment : Fragment() {
 
-    companion object: DefaultFragmentCreator {
-        override val titleId = R.string.favorites
-        override fun newInstance() = FavoriteFragment()
-    }
-
     private lateinit var viewModel: FavoriteViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +22,11 @@ class FavoriteFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(FavoriteViewModel::class.java)
+    }
+
+    companion object: DefaultFragmentCreator {
+        override val titleId = R.string.favorites
+        override fun newInstance() = FavoriteFragment()
     }
 
 }

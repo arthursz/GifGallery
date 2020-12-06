@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ProgressBar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +20,9 @@ import com.arthurzettler.giphygallery.ui.main.GifListAdapter
 class TrendingFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressIndicatorView: ProgressBar
+    private lateinit var errorView: ViewGroup
+    private lateinit var retryButton: Button
 
     private lateinit var viewModel: TrendingViewModel
     private val gifList: MutableList<Gif> = mutableListOf()
@@ -26,24 +32,64 @@ class TrendingFragment : Fragment() {
         return inflater.inflate(R.layout.trending_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        viewModel = ViewModelProvider(this).get(TrendingViewModel::class.java)
-        viewModel.giftList.observe(viewLifecycleOwner, Observer {
-            gifList.addAll(it)
-            recyclerView.adapter?.notifyDataSetChanged()
-        })
-        viewModel.load()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupView(view)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        setupViewModel()
+        loadGifList()
+    }
+
+    private fun setupView(view: View) {
+        errorView = view.findViewById(R.id.error_layout)
+        progressIndicatorView = view.findViewById(R.id.progress_indicator)
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = GifListAdapter(context, gifList)
         }
+        retryButton = view.findViewById<Button>(R.id.retry_button).apply {
+            setOnClickListener { loadGifList() }
+        }
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(this).get(TrendingViewModel::class.java)
+        viewModel.giftList.observe(viewLifecycleOwner, Observer {
+            setListLoaded()
+            gifList.addAll(it)
+            recyclerView.adapter?.notifyDataSetChanged()
+        })
+        viewModel.hasError.observe(viewLifecycleOwner, Observer {
+            if (it) setError() else setLoading()
+        })
+    }
+
+    private fun loadGifList() {
+        setLoading()
+        viewModel.load()
+    }
+
+    private fun setLoading() {
+        progressIndicatorView.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
+        errorView.visibility = View.GONE
+    }
+
+    private fun setListLoaded() {
+        recyclerView.visibility = View.VISIBLE
+        progressIndicatorView.visibility = View.GONE
+        errorView.visibility = View.GONE
+    }
+
+    private fun setError() {
+        errorView.visibility = View.VISIBLE
+        progressIndicatorView.visibility = View.GONE
+        recyclerView.visibility = View.GONE
     }
 
     companion object: DefaultFragmentCreator {

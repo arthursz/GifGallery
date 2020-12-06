@@ -2,4 +2,9 @@
 <resources>
     <dimen name="fav_icon_size">50dp</dimen>
     <dimen name="fav_icon_margin">8dp</dimen>
+
+    <dimen name="error_icon_size">100dp</dimen>
+    <dimen name="error_icon_padding">10dp</dimen>
+    <dimen name="error_text_size">24sp</dimen>
+    <dimen name="error_button_top_margin">10dp</dimen>
 </resources>

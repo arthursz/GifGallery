@@ -4,4 +4,7 @@
     <string name="favorites">Favorites</string>
     <string name="gif">Gif</string>
     <string name="favorite">Favorite</string>
+    <string name="error">Error</string>
+    <string name="error_message">Unable to load gifs.\nPlease press the retry button to try again.</string>
+    <string name="retry_button">Retry</string>
 </resources>

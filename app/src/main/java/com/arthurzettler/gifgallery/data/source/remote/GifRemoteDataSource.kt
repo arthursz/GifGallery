@@ -9,18 +9,20 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.lang.Exception
 
-class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()):
-    GifDataSource {
+class GifRemoteDataSource(
+    private val config: RemoteConfig = RemoteConfig(),
+    private val client: OkHttpClient = OkHttpClient()
+): GifDataSource {
     override suspend fun getFavoriteGifs() = listOf<Gif>()
     override suspend fun storeGif(gif: Gif) {}
     override suspend fun removeGif(gifId: String) {}
 
-    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) { getGifs(
-        TRENDING_URL
-    ) }
+    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) {
+        getGifs(TRENDING_URL.format(config.getApiKey()))
+    }
 
     override suspend fun getGifsForSearchQuery(query: String) = withContext(Dispatchers.IO) {
-        getGifs(SEARCH_URL.format(query))
+        getGifs(SEARCH_URL.format(config.getApiKey(), query))
     }
 
     private fun getGifs(url: String): List<Gif> {
@@ -56,7 +58,7 @@ class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()):
     }
 
     companion object {
-        private const val TRENDING_URL = "https://api.giphy.com/v1/gifs/trending?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&limit=25"
-        private const val SEARCH_URL = "https://api.giphy.com/v1/gifs/search?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&q=%s&limit=25"
+        private const val TRENDING_URL = "https://api.giphy.com/v1/gifs/trending?api_key=%s&limit=25"
+        private const val SEARCH_URL = "https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=25"
     }
 }

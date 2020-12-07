@@ -1,7 +1,6 @@
 package com.arthurzettler.gifgallery.data.source.remote
 
 import com.arthurzettler.gifgallery.data.Gif
-import com.arthurzettler.gifgallery.data.source.remote.GifRemoteDataSource
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
@@ -31,10 +30,14 @@ class GifRemoteDataSourceTest {
     private lateinit var mockResponse: Response
 
     @RelaxedMockK
+    private lateinit var mockRemoteConfig: RemoteConfig
+
+    @RelaxedMockK
     private lateinit var mockResponseBody: ResponseBody
 
     private lateinit var gifRemoteDataSource: GifRemoteDataSource
 
+    private val apiKey = "teste-api-key"
     private val validJson = "{\"data\": [{ \"id\": \"1\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/1\"}}},{ \"id\": \"2\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
     private val jsonWithoutOriginalData = "{\"data\": [{ \"id\": \"1\", \"images\": {}},{ \"id\": \"2\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
 
@@ -43,11 +46,9 @@ class GifRemoteDataSourceTest {
         MockKAnnotations.init(this)
 
         mockkConstructor(Request.Builder::class)
+        every { mockRemoteConfig.getApiKey() } returns apiKey
 
-        gifRemoteDataSource =
-            GifRemoteDataSource(
-                mockClient
-            )
+        gifRemoteDataSource = GifRemoteDataSource(mockRemoteConfig, mockClient)
     }
 
     @After
@@ -57,7 +58,7 @@ class GifRemoteDataSourceTest {
 
     @Test
     fun `should get trending gifs from server`() = runBlocking {
-        val expectedUrl = "https://api.giphy.com/v1/gifs/trending?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&limit=25"
+        val expectedUrl = "https://api.giphy.com/v1/gifs/trending?api_key=$apiKey&limit=25"
         val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
 
         every { mockResponseBody.string() } returns validJson
@@ -125,7 +126,7 @@ class GifRemoteDataSourceTest {
 
     @Test
     fun `should get searched gifs from server`() = runBlocking {
-        val expectedUrl = "https://api.giphy.com/v1/gifs/search?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&q=fun&limit=25"
+        val expectedUrl = "https://api.giphy.com/v1/gifs/search?api_key=$apiKey&q=fun&limit=25"
         val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
 
         every { mockResponseBody.string() } returns validJson

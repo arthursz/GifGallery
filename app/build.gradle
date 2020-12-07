@@ -23,6 +23,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        all {
+            buildConfigField "String", "GIPHY_API_KEY", "\"${System.getenv("GIPHY_API_KEY")}\"" ?: ""
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -1,6 +1,7 @@
-package com.arthurzettler.giphygallery.data.source
+package com.arthurzettler.giphygallery.data.source.remote
 
 import com.arthurzettler.giphygallery.data.Gif
+import com.arthurzettler.giphygallery.data.source.GifDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -8,9 +9,15 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.lang.Exception
 
-class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): GifDataSource {
+class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()):
+    GifDataSource {
+    override suspend fun getFavoriteGifs() = listOf<Gif>()
+    override suspend fun storeGif(gif: Gif) {}
+    override suspend fun removeGif(gifId: String) {}
 
-    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) { getGifs(TRENDING_URL) }
+    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) { getGifs(
+        TRENDING_URL
+    ) }
 
     override suspend fun getGifsForSearchQuery(query: String) = withContext(Dispatchers.IO) {
         getGifs(SEARCH_URL.format(query))

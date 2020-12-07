@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.arthurzettler.giphygallery.ContextHolder
 import com.arthurzettler.giphygallery.R
 import com.arthurzettler.giphygallery.ui.fragment.DefaultFragmentCreator
 import com.arthurzettler.giphygallery.ui.fragment.favorite.FavoriteFragment
@@ -25,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+
+        ContextHolder.context = this.applicationContext
 
         configureFragments()
     }

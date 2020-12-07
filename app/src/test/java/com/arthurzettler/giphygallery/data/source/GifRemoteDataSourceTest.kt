@@ -1,6 +1,7 @@
 package com.arthurzettler.giphygallery.data.source
 
 import com.arthurzettler.giphygallery.data.Gif
+import com.arthurzettler.giphygallery.data.source.remote.GifRemoteDataSource
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
@@ -43,7 +44,10 @@ class GifRemoteDataSourceTest {
 
         mockkConstructor(Request.Builder::class)
 
-        gifRemoteDataSource = GifRemoteDataSource(mockClient)
+        gifRemoteDataSource =
+            GifRemoteDataSource(
+                mockClient
+            )
     }
 
     @After

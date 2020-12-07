@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arthurzettler.giphygallery.data.Result
 import com.arthurzettler.giphygallery.data.Gif
+import com.arthurzettler.giphygallery.data.Result
 import com.arthurzettler.giphygallery.data.source.GifRepository
 import com.arthurzettler.giphygallery.data.source.GifRepositoryImpl
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) : ViewModel() {
+
     private val internalGifList = MutableLiveData<List<Gif>>(listOf())
     val gifList: LiveData<List<Gif>> = internalGifList
 
@@ -25,8 +26,10 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
     fun load() = viewModelScope.launch {
         internalHasError.setValueOnUiThread(false)
 
+        if (loadFavoriteGifs().not()) return@launch
+
         when (val result = repository.getTrendingGifs()) {
-            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value)
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites())
             is Result.Failure -> internalHasError.setValueOnUiThread(true)
         }
     }
@@ -35,25 +38,57 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
         internalHasError.setValueOnUiThread(false)
 
         when (val result = repository.getGifsForSearchQuery(query)) {
-            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value)
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites())
             is Result.Failure -> internalHasError.setValueOnUiThread(true)
         }
     }
 
-    fun setFavoriteGif(gif: Gif, isFavorite: Boolean) {
+    fun setFavoriteGif(gif: Gif, isFavorite: Boolean) = viewModelScope.launch {
         gif.isFavorited = isFavorite
 
         when (isFavorite) {
-            true -> internalFavoriteGifList.value?.add(gif)
-            false -> internalFavoriteGifList.value?.remove(gif)
+            true -> addFavoriteGif(gif)
+            false -> removeFavoriteGif(gif)
         }
 
-        internalGifList.value?.find { it.id == gif.id }?.isFavorited = isFavorite
+        internalGifList.value?.setFavorite(gif, isFavorite)
     }
 
     fun notifyFavoriteGifListObserver() { internalFavoriteGifList.notifyObserver() }
 
     fun notifyGifListObserver() { internalGifList.notifyObserver() }
+
+    private suspend fun loadFavoriteGifs() =
+        when (val result = repository.getFavoriteGifs()) {
+            is Result.Success<List<Gif>> -> {
+                val favoriteGifs = mutableListOf<Gif>().apply { addAll(result.value) }
+                internalFavoriteGifList.setValueOnUiThread(favoriteGifs)
+                true
+            }
+            is Result.Failure -> {
+                internalHasError.setValueOnUiThread(true)
+                false
+            }
+        }
+
+    private suspend fun removeFavoriteGif(gif: Gif) {
+        internalFavoriteGifList.value?.remove(gif)
+        repository.removeFavoriteGif(gif.id)
+    }
+
+    private suspend fun addFavoriteGif(gif: Gif) {
+        internalFavoriteGifList.value?.add(gif)
+        repository.storeFavoriteGif(gif)
+    }
+
+    private fun List<Gif>.setFavorites() : List<Gif> {
+        internalFavoriteGifList.value?.forEach { setFavorite(it, it.isFavorited) }
+        return this
+    }
+
+    private fun List<Gif>.setFavorite(gif: Gif, isFavorite: Boolean) {
+        this.find { it.id == gif.id }?.isFavorited = isFavorite
+    }
 
     private suspend fun <T> MutableLiveData<T>.setValueOnUiThread(newValue: T) =
         withContext(Dispatchers.Main) { value = newValue }

@@ -29,12 +29,14 @@ class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): Gi
         val dataArray = json.getJSONArray("data")
 
         (0 until dataArray.length()).forEach { index ->
-            val url = dataArray.getJSONObject(index)
+            val gifData = dataArray.getJSONObject(index)
+            val id = gifData.getString("id")
+            val url = gifData
                 .optJSONObject("images")
                 ?.optJSONObject("original")
                 ?.optString("url")
 
-            url?.let { gifList.add(Gif(it)) }
+            url?.let { gifList.add(Gif(id, it)) }
         }
 
         return gifList

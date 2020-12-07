@@ -1,5 +1,7 @@
 package com.arthurzettler.giphygallery.ui.main
 
+import com.arthurzettler.giphygallery.data.Gif
+
 interface GifListInteraction {
-    fun onGifFavoriteStatusChanged(position: Int, isFavorite: Boolean)
+    fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean)
 }

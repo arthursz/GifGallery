@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arthurzettler.giphygallery.R
 import com.arthurzettler.giphygallery.data.Gif
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 
 class GifListAdapter(
         private val context: Context,
@@ -35,13 +36,14 @@ class GifListAdapter(
 
         holder.gifFavoriteButton.isSelected = gif.isFavorited
         holder.gifFavoriteButton.setOnClickListener { view ->
-            interaction.onGifFavoriteStatusChanged(position, view?.isSelected?.not() ?: false)
+            interaction.onGifFavoriteStatusChanged(gif, view?.isSelected?.not() ?: false)
         }
 
         Glide.with(context)
             .asGif()
             .load(gif.url)
             .placeholder(R.drawable.ic_animated_progress_indicator)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(holder.gifContainerView)
     }
 }

@@ -5,6 +5,7 @@ import com.arthurzettler.giphygallery.data.Gif
 import com.arthurzettler.giphygallery.data.Result
 import com.arthurzettler.giphygallery.data.source.GifRepository
 import com.arthurzettler.giphygallery.getOrAwaitValue
+import com.arthurzettler.giphygallery.ui.main.GifViewModel
 import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -21,7 +22,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class TrendingViewModelTest {
+class GifViewModelTest {
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -29,7 +30,7 @@ class TrendingViewModelTest {
     @RelaxedMockK
     private lateinit var mockRepository: GifRepository
 
-    private lateinit var trendingViewModel: TrendingViewModel
+    private lateinit var gifViewModel: GifViewModel
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
 
@@ -39,39 +40,39 @@ class TrendingViewModelTest {
 
         Dispatchers.setMain(testCoroutineDispatcher)
 
-        trendingViewModel = TrendingViewModel(mockRepository)
+        gifViewModel = GifViewModel(mockRepository)
     }
 
     @Test
     fun `should notify gif list live data when gifs are loaded`() = runBlockingTest {
-        val expectedGifList = listOf(Gif("https://gif-url.com/1"), Gif("https://gif-url.com/2"))
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
         val result = Result.Success(expectedGifList)
 
         coEvery { mockRepository.getTrendingGifs() } returns result
 
-        trendingViewModel.load()
+        gifViewModel.load()
 
-        assertThat(trendingViewModel.giftList.getOrAwaitValue()).isEqualTo(expectedGifList)
+        assertThat(gifViewModel.gifList.getOrAwaitValue()).isEqualTo(expectedGifList)
     }
 
     @Test
     fun `should reset has error when load is called`() = runBlockingTest {
-        val expectedGifList = listOf(Gif("https://gif-url.com/1"), Gif("https://gif-url.com/2"))
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
         val result = Result.Success(expectedGifList)
 
         coEvery { mockRepository.getTrendingGifs() } returns result
 
-        trendingViewModel.load()
+        gifViewModel.load()
 
-        assertFalse("Has error should be false", trendingViewModel.hasError.getOrAwaitValue())
+        assertFalse("Has error should be false", gifViewModel.hasError.getOrAwaitValue())
     }
 
     @Test
     fun `should set has error when gif loading fails`() = runBlockingTest {
         coEvery { mockRepository.getTrendingGifs() } returns Result.Failure
 
-        trendingViewModel.load()
+        gifViewModel.load()
 
-        assertTrue("Has error should be true", trendingViewModel.hasError.getOrAwaitValue())
+        assertTrue("Has error should be true", gifViewModel.hasError.getOrAwaitValue())
     }
 }

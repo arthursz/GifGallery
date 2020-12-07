@@ -29,7 +29,7 @@ class GifRepositoryImplTest {
 
     @Test
     fun `should get trending gifs from remote data source`() = runBlockingTest {
-        val expectedGifList = listOf(Gif("https://gif-url.com/1"), Gif("https://gif-url.com/2"))
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
         val expectedResult = Result.Success(expectedGifList)
 
         coEvery { mockRemoteDataSource.getTrendingGifs() } returns expectedGifList

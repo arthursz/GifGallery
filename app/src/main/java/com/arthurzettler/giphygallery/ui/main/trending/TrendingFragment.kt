@@ -1,6 +1,5 @@
 package com.arthurzettler.giphygallery.ui.main.trending
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +16,7 @@ import com.arthurzettler.giphygallery.data.Gif
 import com.arthurzettler.giphygallery.ui.main.DefaultFragmentCreator
 import com.arthurzettler.giphygallery.ui.main.GifListAdapter
 import com.arthurzettler.giphygallery.ui.main.GifListInteraction
+import com.arthurzettler.giphygallery.ui.main.GifViewModel
 
 class TrendingFragment : Fragment(), GifListInteraction {
 
@@ -24,7 +25,7 @@ class TrendingFragment : Fragment(), GifListInteraction {
     private lateinit var errorView: ViewGroup
     private lateinit var retryButton: Button
 
-    private lateinit var viewModel: TrendingViewModel
+    private val viewModel: GifViewModel by activityViewModels()
     private val gifList: MutableList<Gif> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -34,20 +35,19 @@ class TrendingFragment : Fragment(), GifListInteraction {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupView(view)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         setupViewModel()
         loadGifList()
     }
 
-    override fun onGifFavoriteStatusChanged(position: Int, isFavorite: Boolean) {
-        gifList[position].isFavorited = isFavorite
-        recyclerView.adapter?.notifyItemChanged(position)
+    override fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean) {
+        viewModel.setFavoriteGif(gif, isFavorite)
+        viewModel.updateFavoriteGifList()
+        recyclerView.adapter?.notifyItemChanged(gifList.indexOf(gif))
     }
 
     private fun setupView(view: View) {
@@ -56,6 +56,7 @@ class TrendingFragment : Fragment(), GifListInteraction {
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = GifListAdapter(context, gifList, this@TrendingFragment)
+            itemAnimator = null
         }
         retryButton = view.findViewById<Button>(R.id.retry_button).apply {
             setOnClickListener { loadGifList() }
@@ -63,9 +64,9 @@ class TrendingFragment : Fragment(), GifListInteraction {
     }
 
     private fun setupViewModel() {
-        viewModel = ViewModelProvider(this).get(TrendingViewModel::class.java)
-        viewModel.giftList.observe(viewLifecycleOwner, Observer {
+        viewModel.gifList.observe(viewLifecycleOwner, Observer {
             setListLoaded()
+            gifList.clear()
             gifList.addAll(it)
             recyclerView.adapter?.notifyDataSetChanged()
         })

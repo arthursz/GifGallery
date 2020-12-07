@@ -34,8 +34,8 @@ class GifRemoteDataSourceTest {
 
     private lateinit var gifRemoteDataSource: GifRemoteDataSource
 
-    private val validJson = "{\"data\": [{ \"images\": {\"original\": {\"url\": \"https://gif-url.com/1\"}}},{ \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
-    private val jsonWithoutOriginalData = "{\"data\": [{ \"images\": {}},{ \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
+    private val validJson = "{\"data\": [{ \"id\": \"1\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/1\"}}},{ \"id\": \"2\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
+    private val jsonWithoutOriginalData = "{\"data\": [{ \"id\": \"1\", \"images\": {}},{ \"id\": \"2\", \"images\": {\"original\": {\"url\": \"https://gif-url.com/2\"}}}]}"
 
     @Before
     fun setup() {
@@ -54,7 +54,7 @@ class GifRemoteDataSourceTest {
     @Test
     fun `should get trending gifs from server`() = runBlocking {
         val expectedUrl = "https://api.giphy.com/v1/gifs/trending?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&limit=25"
-        val expectedGifList = listOf(Gif("https://gif-url.com/1"), Gif("https://gif-url.com/2"))
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
 
         every { mockResponseBody.string() } returns validJson
         every { mockResponse.isSuccessful } returns true
@@ -70,7 +70,7 @@ class GifRemoteDataSourceTest {
 
     @Test
     fun `should not fail to get trending gifs when response not have original gif data`() = runBlocking {
-        val expectedGifList = listOf(Gif("https://gif-url.com/2"))
+        val expectedGifList = listOf(Gif("2","https://gif-url.com/2"))
 
         every { mockResponseBody.string() } returns jsonWithoutOriginalData
         every { mockResponse.isSuccessful } returns true

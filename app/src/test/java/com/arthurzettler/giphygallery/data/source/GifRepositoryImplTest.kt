@@ -48,4 +48,29 @@ class GifRepositoryImplTest {
 
         assertThat(result).isEqualTo(Result.Failure)
     }
+
+    @Test
+    fun `should get searched gifs from remote data source`() = runBlockingTest {
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
+        val expectedResult = Result.Success(expectedGifList)
+        val query = "fun"
+
+        coEvery { mockRemoteDataSource.getGifsForSearchQuery(query) } returns expectedGifList
+
+        val result = gifRepository.getGifsForSearchQuery(query)
+
+        coVerify { mockRemoteDataSource.getGifsForSearchQuery(query) }
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `should return result failure when error happens getting searched gifs`() = runBlockingTest {
+        val query = "fun"
+
+        coEvery { mockRemoteDataSource.getGifsForSearchQuery(query) } throws Exception()
+
+        val result = gifRepository.getGifsForSearchQuery(query)
+
+        assertThat(result).isEqualTo(Result.Failure)
+    }
 }

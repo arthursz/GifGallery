@@ -118,4 +118,72 @@ class GifRemoteDataSourceTest {
             assertThat(exception.message).isEqualTo(expectedException.message)
         }
     }
+
+    @Test
+    fun `should get searched gifs from server`() = runBlocking {
+        val expectedUrl = "https://api.giphy.com/v1/gifs/search?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&q=fun&limit=25"
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
+
+        every { mockResponseBody.string() } returns validJson
+        every { mockResponse.isSuccessful } returns true
+        every { mockResponse.body } returns mockResponseBody
+        every { mockCall.execute() } returns mockResponse
+        every { mockClient.newCall(any()) } returns mockCall
+
+        val gifList = gifRemoteDataSource.getGifsForSearchQuery("fun")
+
+        verify { anyConstructed<Request.Builder>().url(expectedUrl) }
+        assertThat(gifList).isEqualTo(expectedGifList)
+    }
+
+    @Test
+    fun `should not fail to get searched gifs when response not have original gif data`() = runBlocking {
+        val expectedGifList = listOf(Gif("2","https://gif-url.com/2"))
+
+        every { mockResponseBody.string() } returns jsonWithoutOriginalData
+        every { mockResponse.isSuccessful } returns true
+        every { mockResponse.body } returns mockResponseBody
+        every { mockCall.execute() } returns mockResponse
+        every { mockClient.newCall(any()) } returns mockCall
+
+        val gifList = gifRemoteDataSource.getGifsForSearchQuery("fun")
+
+        assertThat(gifList).isEqualTo(expectedGifList)
+    }
+
+    @Test
+    fun `should throw exception when response is not successful getting searched gifs`() = runBlocking {
+        val expectedException = Exception("Response not successful")
+
+        every { mockResponse.message } returns "Response not successful"
+        every { mockResponse.isSuccessful } returns false
+        every { mockResponse.body } returns mockResponseBody
+        every { mockCall.execute() } returns mockResponse
+        every { mockClient.newCall(any()) } returns mockCall
+
+        try {
+            gifRemoteDataSource.getGifsForSearchQuery("fun")
+            fail("Should throw exception when response is not successful")
+        } catch (exception: Exception) {
+            assertThat(exception.message).isEqualTo(expectedException.message)
+        }
+    }
+
+    @Test
+    fun `should throw exception when response body is null getting searched gifs`() = runBlocking {
+        val expectedException = Exception("Response not successful")
+
+        every { mockResponse.message } returns "Response not successful"
+        every { mockResponse.isSuccessful } returns true
+        every { mockResponse.body } returns null
+        every { mockCall.execute() } returns mockResponse
+        every { mockClient.newCall(any()) } returns mockCall
+
+        try {
+            gifRemoteDataSource.getGifsForSearchQuery("fun")
+            fail("Should throw exception when response body is null")
+        } catch (exception: Exception) {
+            assertThat(exception.message).isEqualTo(expectedException.message)
+        }
+    }
 }

@@ -77,6 +77,42 @@ class GifViewModelTest {
     }
 
     @Test
+    fun `should notify gif list live data when gifs are loaded from search`() = runBlockingTest {
+        val query = "fun"
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
+        val result = Result.Success(expectedGifList)
+
+        coEvery { mockRepository.getGifsForSearchQuery(query) } returns result
+
+        gifViewModel.search(query)
+
+        assertThat(gifViewModel.gifList.getOrAwaitValue()).isEqualTo(expectedGifList)
+    }
+
+    @Test
+    fun `should reset has error when search is called`() = runBlockingTest {
+        val query = "fun"
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
+        val result = Result.Success(expectedGifList)
+
+        coEvery { mockRepository.getGifsForSearchQuery(query) } returns result
+
+        gifViewModel.search(query)
+
+        assertFalse("Has error should be false", gifViewModel.hasError.getOrAwaitValue())
+    }
+
+    @Test
+    fun `should set has error when gif loading fails during search`() = runBlockingTest {
+        val query = "fun"
+        coEvery { mockRepository.getGifsForSearchQuery(query) } returns Result.Failure
+
+        gifViewModel.search(query)
+
+        assertTrue("Has error should be true", gifViewModel.hasError.getOrAwaitValue())
+    }
+
+    @Test
     fun `should add favorite gif to favorite gif list`() {
         val expectedGifList = listOf(Gif("1","https://gif-url.com/1", true))
 

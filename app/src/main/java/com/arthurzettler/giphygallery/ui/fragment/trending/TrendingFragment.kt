@@ -34,6 +34,11 @@ class TrendingFragment : Fragment(), GifListInteraction {
         return inflater.inflate(R.layout.trending_fragment, container, false)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        setupSearchMenu(inflater, menu)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView(view)
@@ -45,42 +50,27 @@ class TrendingFragment : Fragment(), GifListInteraction {
         loadGifList()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean) {
+        viewModel.setFavoriteGif(gif, isFavorite)
+        viewModel.notifyFavoriteGifListObserver()
+        recyclerView.adapter?.notifyItemChanged(gifList.indexOf(gif))
+    }
+
+    private fun setupSearchMenu(inflater: MenuInflater, menu: Menu) {
         inflater.inflate(R.menu.options_menu, menu)
 
         val searchView = SearchView(context).apply {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextChange(newText: String): Boolean {
-                    if (query.isEmpty()) {
-                        loadGifList()
-                        currentQuery = ""
-                    }
-                    return false
-                }
-
-                override fun onQueryTextSubmit(query: String): Boolean {
-                    if (query.isEmpty().not()) searchGifs(query)
-                    currentQuery = query
-                    return false
-                }
+                override fun onQueryTextChange(newText: String) = handleTextChange()
+                override fun onQueryTextSubmit(query: String) = applySearch(query)
             })
-            if (currentQuery.isEmpty().not()) {
-                setQuery(currentQuery, false)
-                openSearchView() 
-            }
+            handleEmptyCurrentQuery()
         }
 
         menu.findItem(R.id.search).apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
         }
-    }
-
-    override fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean) {
-        viewModel.setFavoriteGif(gif, isFavorite)
-        viewModel.notifyFavoriteGifListObserver()
-        recyclerView.adapter?.notifyItemChanged(gifList.indexOf(gif))
     }
 
     private fun setupView(view: View) {
@@ -139,6 +129,29 @@ class TrendingFragment : Fragment(), GifListInteraction {
     private fun SearchView.openSearchView() {
         isIconified = false
         clearFocus()
+    }
+
+    private fun SearchView.handleEmptyCurrentQuery() {
+        if (currentQuery.isEmpty().not()) {
+            setQuery(currentQuery, false)
+            openSearchView()
+        }
+    }
+
+    private fun SearchView.handleTextChange(): Boolean {
+        if (query.isEmpty()) {
+            recyclerView.smoothScrollToPosition(0)
+            loadGifList()
+            currentQuery = ""
+        }
+        return false
+    }
+
+    private fun applySearch(query: String): Boolean {
+        recyclerView.smoothScrollToPosition(0)
+        if (query.isEmpty().not()) searchGifs(query)
+        currentQuery = query
+        return false
     }
 
     companion object: DefaultFragmentCreator {

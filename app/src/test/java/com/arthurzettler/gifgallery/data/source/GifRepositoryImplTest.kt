@@ -1,7 +1,7 @@
 package com.arthurzettler.gifgallery.data.source
 
-import com.arthurzettler.gifgallery.data.Result
 import com.arthurzettler.gifgallery.data.Gif
+import com.arthurzettler.gifgallery.data.Result
 import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -18,13 +18,16 @@ class GifRepositoryImplTest {
     @RelaxedMockK
     private lateinit var mockRemoteDataSource: GifDataSource
 
+    @RelaxedMockK
+    private lateinit var mockLocalDataSource: GifDataSource
+
     private lateinit var gifRepository : GifRepository
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        gifRepository = GifRepositoryImpl(mockRemoteDataSource)
+        gifRepository = GifRepositoryImpl(mockRemoteDataSource, mockLocalDataSource)
     }
 
     @Test
@@ -72,5 +75,45 @@ class GifRepositoryImplTest {
         val result = gifRepository.getGifsForSearchQuery(query)
 
         assertThat(result).isEqualTo(Result.Failure)
+    }
+
+    @Test
+    fun `should get favorite gifs from local data source`() = runBlockingTest {
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1", true), Gif("2","https://gif-url.com/2", true))
+        val expectedResult = Result.Success(expectedGifList)
+
+        coEvery { mockLocalDataSource.getFavoriteGifs() } returns expectedGifList
+
+        val result = gifRepository.getFavoriteGifs()
+
+        coVerify { mockLocalDataSource.getFavoriteGifs() }
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `should return result failure when error happens getting favorite gifs`() = runBlockingTest {
+        coEvery { mockLocalDataSource.getFavoriteGifs() } throws Exception()
+
+        val result = gifRepository.getFavoriteGifs()
+
+        assertThat(result).isEqualTo(Result.Failure)
+    }
+
+    @Test
+    fun `should store favorite gif on local data source`() = runBlockingTest {
+        val expectedGif = Gif("1", "https://gif-url.com/1", true)
+
+        gifRepository.storeFavoriteGif(expectedGif)
+
+        coVerify { mockLocalDataSource.storeGif(expectedGif) }
+    }
+
+    @Test
+    fun `should remove favorite gif from local data source`() = runBlockingTest {
+        val expectedGifId = "1234"
+
+        gifRepository.removeFavoriteGif(expectedGifId)
+
+        coVerify { mockLocalDataSource.removeGif(expectedGifId) }
     }
 }

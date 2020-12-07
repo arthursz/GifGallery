@@ -1,4 +1,4 @@
-package com.arthurzettler.giphygallery.ui.main
+package com.arthurzettler.giphygallery.ui.fragment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

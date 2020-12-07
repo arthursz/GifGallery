@@ -1,4 +1,4 @@
-package com.arthurzettler.giphygallery
+package com.arthurzettler.giphygallery.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,9 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.arthurzettler.giphygallery.ui.main.DefaultFragmentCreator
-import com.arthurzettler.giphygallery.ui.main.favorite.FavoriteFragment
-import com.arthurzettler.giphygallery.ui.main.trending.TrendingFragment
+import com.arthurzettler.giphygallery.R
+import com.arthurzettler.giphygallery.ui.fragment.DefaultFragmentCreator
+import com.arthurzettler.giphygallery.ui.fragment.favorite.FavoriteFragment
+import com.arthurzettler.giphygallery.ui.fragment.trending.TrendingFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 

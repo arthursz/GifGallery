@@ -1,11 +1,11 @@
-package com.arthurzettler.giphygallery.ui.main.trending
+package com.arthurzettler.giphygallery.ui.fragment
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.arthurzettler.giphygallery.data.Gif
 import com.arthurzettler.giphygallery.data.Result
 import com.arthurzettler.giphygallery.data.source.GifRepository
 import com.arthurzettler.giphygallery.getOrAwaitValue
-import com.arthurzettler.giphygallery.ui.main.GifViewModel
+import com.arthurzettler.giphygallery.ui.fragment.GifViewModel
 import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

@@ -1,4 +1,4 @@
-package com.arthurzettler.giphygallery.ui.main.favorite
+package com.arthurzettler.giphygallery.ui.fragment.favorite
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.arthurzettler.giphygallery.R
 import com.arthurzettler.giphygallery.data.Gif
-import com.arthurzettler.giphygallery.ui.main.DefaultFragmentCreator
-import com.arthurzettler.giphygallery.ui.main.GifListAdapter
-import com.arthurzettler.giphygallery.ui.main.GifListInteraction
-import com.arthurzettler.giphygallery.ui.main.GifViewModel
+import com.arthurzettler.giphygallery.ui.fragment.DefaultFragmentCreator
+import com.arthurzettler.giphygallery.ui.fragment.GifListAdapter
+import com.arthurzettler.giphygallery.ui.fragment.GifListInteraction
+import com.arthurzettler.giphygallery.ui.fragment.GifViewModel
 
 class FavoriteFragment : Fragment(), GifListInteraction {
 

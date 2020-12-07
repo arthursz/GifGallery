@@ -1,4 +1,4 @@
-package com.arthurzettler.giphygallery.ui.main.trending
+package com.arthurzettler.giphygallery.ui.fragment.trending
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arthurzettler.giphygallery.R
 import com.arthurzettler.giphygallery.data.Gif
-import com.arthurzettler.giphygallery.ui.main.DefaultFragmentCreator
-import com.arthurzettler.giphygallery.ui.main.GifListAdapter
-import com.arthurzettler.giphygallery.ui.main.GifListInteraction
-import com.arthurzettler.giphygallery.ui.main.GifViewModel
+import com.arthurzettler.giphygallery.ui.fragment.DefaultFragmentCreator
+import com.arthurzettler.giphygallery.ui.fragment.GifListAdapter
+import com.arthurzettler.giphygallery.ui.fragment.GifListInteraction
+import com.arthurzettler.giphygallery.ui.fragment.GifViewModel
 
 class TrendingFragment : Fragment(), GifListInteraction {
 

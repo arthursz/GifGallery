@@ -75,4 +75,36 @@ class GifViewModelTest {
 
         assertTrue("Has error should be true", gifViewModel.hasError.getOrAwaitValue())
     }
+
+    @Test
+    fun `should add favorite gif to favorite gif list`() {
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1", true))
+
+        gifViewModel.setFavoriteGif(Gif("1", "https://gif-url.com/1"), true)
+
+        assertThat(gifViewModel.favoriteGifList.getOrAwaitValue()).isEqualTo(expectedGifList)
+    }
+
+    @Test
+    fun `should remove favorite gif from favorite gif list`() {
+        val gif = Gif("1", "https://gif-url.com/1")
+
+        gifViewModel.setFavoriteGif(gif, true)
+        gifViewModel.setFavoriteGif(gif, false)
+
+        assertThat(gifViewModel.favoriteGifList.getOrAwaitValue()).isEqualTo(mutableListOf<Gif>())
+    }
+
+    @Test
+    fun `should set gif as favorite in gif list`() = runBlockingTest {
+        val expectedGifList = listOf(Gif("1","https://gif-url.com/1", true), Gif("2","https://gif-url.com/2"))
+        val gifList = listOf(Gif("1","https://gif-url.com/1"), Gif("2","https://gif-url.com/2"))
+
+        coEvery { mockRepository.getTrendingGifs() } returns Result.Success(gifList)
+
+        gifViewModel.load()
+        gifViewModel.setFavoriteGif(Gif("1","https://gif-url.com/1"), true)
+
+        assertThat(gifViewModel.gifList.getOrAwaitValue()).isEqualTo(expectedGifList)
+    }
 }

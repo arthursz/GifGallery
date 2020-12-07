@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Giphy Gallery</string>
+    <string name="app_name">Gif Gallery</string>
     <string name="trending">Gifs</string>
     <string name="favorites">Favorites</string>
     <string name="gif">Gif</string>

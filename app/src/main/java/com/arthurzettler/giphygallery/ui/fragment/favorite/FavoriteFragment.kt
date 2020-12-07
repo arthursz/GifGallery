@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -22,9 +20,6 @@ import com.arthurzettler.giphygallery.ui.fragment.GifViewModel
 class FavoriteFragment : Fragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressIndicatorView: ProgressBar
-    private lateinit var errorView: ViewGroup
-    private lateinit var retryButton: Button
 
     private val viewModel: GifViewModel by activityViewModels()
     private val favoriteGifList: MutableList<Gif> = mutableListOf()
@@ -53,14 +48,9 @@ class FavoriteFragment : Fragment(), GifListInteraction {
     }
 
     private fun setupView(view: View) {
-        errorView = view.findViewById(R.id.error_layout)
-        progressIndicatorView = view.findViewById(R.id.progress_indicator)
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
             layoutManager = StaggeredGridLayoutManager(LAYOUT_COLUMNS, LinearLayoutManager.VERTICAL)
             adapter = GifListAdapter(context, favoriteGifList, this@FavoriteFragment)
-        }
-        retryButton = view.findViewById<Button>(R.id.retry_button).apply {
-            setOnClickListener { }
         }
     }
 

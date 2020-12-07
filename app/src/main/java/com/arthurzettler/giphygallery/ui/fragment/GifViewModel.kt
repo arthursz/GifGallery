@@ -26,9 +26,16 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
         internalHasError.setValueOnUiThread(false)
 
         when (val result = repository.getTrendingGifs()) {
-            is Result.Success<List<Gif>> -> {
-                internalGifList.setValueOnUiThread(result.value)
-            }
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value)
+            is Result.Failure -> internalHasError.setValueOnUiThread(true)
+        }
+    }
+
+    fun search(query: String) = viewModelScope.launch {
+        internalHasError.setValueOnUiThread(false)
+
+        when (val result = repository.getGifsForSearchQuery(query)) {
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value)
             is Result.Failure -> internalHasError.setValueOnUiThread(true)
         }
     }

@@ -10,14 +10,20 @@ import java.lang.Exception
 
 class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): GifDataSource {
 
-    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) {
-        val request = Request.Builder().url(TRENDING_URL).build()
+    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) { getGifs(TRENDING_URL) }
+
+    override suspend fun getGifsForSearchQuery(query: String) = withContext(Dispatchers.IO) {
+        getGifs(SEARCH_URL.format(query))
+    }
+
+    private fun getGifs(url: String): List<Gif> {
+        val request = Request.Builder().url(url).build()
         val response = client.newCall(request).execute()
         val responseBody = response.body
 
         if (response.isSuccessful.not() || responseBody == null) throw Exception(response.message)
 
-        return@withContext parseResponse(responseBody.string())
+        return parseResponse(responseBody.string())
     }
 
     private fun parseResponse(body: String): List<Gif> {
@@ -44,5 +50,6 @@ class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): Gi
 
     companion object {
         private const val TRENDING_URL = "https://api.giphy.com/v1/gifs/trending?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&limit=25"
+        private const val SEARCH_URL = "https://api.giphy.com/v1/gifs/search?api_key=Vgshav6wEuIEIhpAVyPx7iMwkmlEVVmk&q=%s&limit=25"
     }
 }

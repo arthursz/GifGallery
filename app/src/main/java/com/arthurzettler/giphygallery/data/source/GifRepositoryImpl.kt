@@ -11,4 +11,11 @@ class GifRepositoryImpl(private val remoteDataSource: GifDataSource = GifRemoteD
         } catch (error: Exception) {
             Result.Failure
         }
+
+    override suspend fun getGifsForSearchQuery(query: String): Result<List<Gif>> =
+        try {
+            Result.Success(remoteDataSource.getGifsForSearchQuery(query))
+        } catch (error: Exception) {
+            Result.Failure
+        }
 }

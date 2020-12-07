@@ -5,4 +5,5 @@ import com.arthurzettler.giphygallery.data.Gif
 
 interface GifRepository {
     suspend fun getTrendingGifs() : Result<List<Gif>>
+    suspend fun getGifsForSearchQuery(query: String): Result<List<Gif>>
 }

@@ -1,4 +1,4 @@
-package com.arthurzettler.gifgallery.data.source
+package com.arthurzettler.gifgallery.data.source.remote
 
 import com.arthurzettler.gifgallery.data.Gif
 import com.arthurzettler.gifgallery.data.source.remote.GifRemoteDataSource

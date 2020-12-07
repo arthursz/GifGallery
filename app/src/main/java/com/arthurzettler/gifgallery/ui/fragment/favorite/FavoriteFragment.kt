@@ -20,6 +20,7 @@ import com.arthurzettler.gifgallery.ui.fragment.GifViewModel
 class FavoriteFragment : Fragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var favoriteMessageView: ViewGroup
 
     private val viewModel: GifViewModel by activityViewModels()
     private val favoriteGifList: MutableList<Gif> = mutableListOf()
@@ -43,11 +44,15 @@ class FavoriteFragment : Fragment(), GifListInteraction {
         val index = favoriteGifList.indexOf(gif)
         viewModel.setFavoriteGif(gif, isFavorite)
         viewModel.notifyGifListObserver()
+
         favoriteGifList.removeAt(index)
         recyclerView.adapter?.notifyItemRemoved(index)
+
+        setViewVisibility(favoriteGifList.size != 0)
     }
 
     private fun setupView(view: View) {
+        favoriteMessageView = view.findViewById(R.id.favorite_message_layout)
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
             layoutManager = StaggeredGridLayoutManager(LAYOUT_COLUMNS, LinearLayoutManager.VERTICAL)
             adapter = GifListAdapter(context, favoriteGifList, this@FavoriteFragment)
@@ -56,10 +61,24 @@ class FavoriteFragment : Fragment(), GifListInteraction {
 
     private fun setupViewModel() {
         viewModel.favoriteGifList.observe(viewLifecycleOwner, Observer {
+            setViewVisibility(it.size != 0)
             favoriteGifList.clear()
             favoriteGifList.addAll(it)
             recyclerView.adapter?.notifyDataSetChanged()
         })
+    }
+
+    private fun setViewVisibility(haveFavorites: Boolean) {
+        when(haveFavorites) {
+            true -> {
+                recyclerView.visibility = View.VISIBLE
+                favoriteMessageView.visibility = View.GONE
+            }
+            false -> {
+                favoriteMessageView.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            }
+        }
     }
 
     companion object: DefaultFragmentCreator {

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/favorite_image"
+        android:layout_width="@dimen/fav_message_icon_size"
+        android:layout_height="@dimen/fav_message_icon_size"
+        android:contentDescription="@string/favorite"
+        android:padding="@dimen/fav_icon_margin"
+        android:src="@drawable/ic_favorite_fill" />
+
+    <TextView
+        android:id="@+id/favorite_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/favorite_message"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_size" />
+</LinearLayout>

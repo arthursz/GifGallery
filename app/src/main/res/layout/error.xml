@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="@string/error_message"
         android:textAlignment="center"
-        android:textSize="@dimen/error_text_size" />
+        android:textSize="@dimen/text_size" />
 
     <Button
         android:id="@+id/retry_button"

@@ -46,7 +46,7 @@ class TrendingFragment : Fragment(), GifListInteraction {
 
     override fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean) {
         viewModel.setFavoriteGif(gif, isFavorite)
-        viewModel.updateFavoriteGifList()
+        viewModel.notifyFavoriteGifListObserver()
         recyclerView.adapter?.notifyItemChanged(gifList.indexOf(gif))
     }
 

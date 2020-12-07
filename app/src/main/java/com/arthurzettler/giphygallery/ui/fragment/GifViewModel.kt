@@ -44,14 +44,12 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
         internalGifList.value?.find { it.id == gif.id }?.isFavorited = isFavorite
     }
 
-    fun updateFavoriteGifList() {
-        internalFavoriteGifList.value = internalFavoriteGifList.value
-    }
+    fun notifyFavoriteGifListObserver() { internalFavoriteGifList.notifyObserver() }
 
-    fun updateGifList() {
-        internalGifList.value = internalGifList.value
-    }
+    fun notifyGifListObserver() { internalGifList.notifyObserver() }
 
     private suspend fun <T> MutableLiveData<T>.setValueOnUiThread(newValue: T) =
         withContext(Dispatchers.Main) { value = newValue }
+
+    private fun <T> MutableLiveData<T>.notifyObserver() { this.value = this.value }
 }

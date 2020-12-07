@@ -47,7 +47,7 @@ class FavoriteFragment : Fragment(), GifListInteraction {
     override fun onGifFavoriteStatusChanged(gif: Gif, isFavorite: Boolean) {
         val index = favoriteGifList.indexOf(gif)
         viewModel.setFavoriteGif(gif, isFavorite)
-        viewModel.updateGifList()
+        viewModel.notifyGifListObserver()
         favoriteGifList.removeAt(index)
         recyclerView.adapter?.notifyItemRemoved(index)
     }

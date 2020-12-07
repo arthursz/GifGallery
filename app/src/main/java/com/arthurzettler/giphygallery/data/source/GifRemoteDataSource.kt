@@ -34,9 +34,9 @@ class GifRemoteDataSource(private val client: OkHttpClient = OkHttpClient()): Gi
             val url = gifData
                 .optJSONObject("images")
                 ?.optJSONObject("original")
-                ?.optString("url")
+                ?.optString("url") ?: return@forEach
 
-            url?.let { gifList.add(Gif(id, it)) }
+            gifList.add(Gif(id, url))
         }
 
         return gifList

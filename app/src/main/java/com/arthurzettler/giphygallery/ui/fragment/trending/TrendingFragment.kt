@@ -52,7 +52,10 @@ class TrendingFragment : Fragment(), GifListInteraction {
         val searchView = SearchView(context).apply {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextChange(newText: String): Boolean {
-                    if (query.isEmpty()) loadGifList()
+                    if (query.isEmpty()) {
+                        loadGifList()
+                        currentQuery = ""
+                    }
                     return false
                 }
 

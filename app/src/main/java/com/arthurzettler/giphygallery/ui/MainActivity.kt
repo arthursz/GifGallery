@@ -1,7 +1,9 @@
 package com.arthurzettler.giphygallery.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -29,6 +31,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureFragments() {
         viewPager.adapter = PageAdapter(this, fragments)
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                hideKeyboardFrom()
+                super.onPageSelected(position)
+            }
+        })
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
@@ -36,6 +44,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getTabTitle(position: Int) = getString(fragments[position].titleId)
+
+    fun hideKeyboardFrom() {
+        (this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+            hideSoftInputFromWindow(this@MainActivity.currentFocus?.windowToken, 0)
+        }
+    }
 }
 
 private class PageAdapter(

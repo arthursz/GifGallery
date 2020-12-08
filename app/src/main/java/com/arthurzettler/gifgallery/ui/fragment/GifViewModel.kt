@@ -14,8 +14,8 @@ import kotlinx.coroutines.withContext
 
 class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) : ViewModel() {
 
-    private val internalGifList = MutableLiveData<List<Gif>>(listOf())
-    val gifList: LiveData<List<Gif>> = internalGifList
+    private val internalGifList = MutableLiveData<MutableList<Gif>>(mutableListOf())
+    val gifList: LiveData<MutableList<Gif>> = internalGifList
 
     private val internalFavoriteGifList = MutableLiveData<MutableList<Gif>>(mutableListOf())
     val favoriteGifList: LiveData<MutableList<Gif>> = internalFavoriteGifList
@@ -23,23 +23,40 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
     private val internalHasError = MutableLiveData(false)
     val hasError: LiveData<Boolean> = internalHasError
 
+    private var currentPage = 0
+
     fun load() = viewModelScope.launch {
-        internalHasError.setValueOnUiThread(false)
+        reset()
 
         if (loadFavoriteGifs().not()) return@launch
 
-        when (val result = repository.getTrendingGifs()) {
-            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites())
+        when (val result = repository.getTrendingGifs(currentPage)) {
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites().toMutableList())
             is Result.Failure -> internalHasError.setValueOnUiThread(true)
         }
     }
 
     fun search(query: String) = viewModelScope.launch {
-        internalHasError.setValueOnUiThread(false)
+        reset()
 
-        when (val result = repository.getGifsForSearchQuery(query)) {
-            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites())
+        when (val result = repository.getGifsForSearchQuery(query, currentPage)) {
+            is Result.Success<List<Gif>> -> internalGifList.setValueOnUiThread(result.value.setFavorites().toMutableList())
             is Result.Failure -> internalHasError.setValueOnUiThread(true)
+        }
+    }
+
+    fun paginate(query: String) = viewModelScope.launch {
+        currentPage++
+
+        val page = currentPage * 25
+        val result = if (query.isEmpty()) repository.getTrendingGifs(page)
+                     else repository.getGifsForSearchQuery(query, page)
+
+        if (result is Result.Success<List<Gif>>) {
+            internalGifList.value?.let {
+                it.addAll(result.value.setFavorites())
+                internalGifList.setValueOnUiThread(it)
+            }
         }
     }
 
@@ -58,11 +75,15 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
 
     fun notifyGifListObserver() { internalGifList.notifyObserver() }
 
+    private suspend fun reset() {
+        currentPage = 0
+        internalHasError.setValueOnUiThread(false)
+    }
+
     private suspend fun loadFavoriteGifs() =
         when (val result = repository.getFavoriteGifs()) {
             is Result.Success<List<Gif>> -> {
-                val favoriteGifs = mutableListOf<Gif>().apply { addAll(result.value) }
-                internalFavoriteGifList.setValueOnUiThread(favoriteGifs)
+                internalFavoriteGifList.setValueOnUiThread(result.value.toMutableList())
                 true
             }
             is Result.Failure -> {
@@ -92,6 +113,5 @@ class GifViewModel(private val repository: GifRepository = GifRepositoryImpl()) 
 
     private suspend fun <T> MutableLiveData<T>.setValueOnUiThread(newValue: T) =
         withContext(Dispatchers.Main) { value = newValue }
-
     private fun <T> MutableLiveData<T>.notifyObserver() { this.value = this.value }
 }

@@ -10,16 +10,16 @@ class GifRepositoryImpl(
     private val remoteDataSource: GifDataSource = GifRemoteDataSource(),
     private val localDataSource: GifDataSource = GifLocalDataSource()
 ) : GifRepository {
-    override suspend fun getTrendingGifs(): Result<List<Gif>> =
+    override suspend fun getTrendingGifs(page: Int): Result<List<Gif>> =
         try {
-            Result.Success(remoteDataSource.getTrendingGifs())
+            Result.Success(remoteDataSource.getTrendingGifs(page))
         } catch (error: Exception) {
             Result.Failure
         }
 
-    override suspend fun getGifsForSearchQuery(query: String): Result<List<Gif>> =
+    override suspend fun getGifsForSearchQuery(query: String, page: Int): Result<List<Gif>> =
         try {
-            Result.Success(remoteDataSource.getGifsForSearchQuery(query))
+            Result.Success(remoteDataSource.getGifsForSearchQuery(query, page))
         } catch (error: Exception) {
             Result.Failure
         }

@@ -17,12 +17,12 @@ class GifRemoteDataSource(
     override suspend fun storeGif(gif: Gif) {}
     override suspend fun removeGif(gifId: String) {}
 
-    override suspend fun getTrendingGifs() = withContext(Dispatchers.IO) {
-        getGifs(TRENDING_URL.format(config.getApiKey()))
+    override suspend fun getTrendingGifs(page: Int) = withContext(Dispatchers.IO) {
+        getGifs(TRENDING_URL.format(config.getApiKey(), page))
     }
 
-    override suspend fun getGifsForSearchQuery(query: String) = withContext(Dispatchers.IO) {
-        getGifs(SEARCH_URL.format(config.getApiKey(), query))
+    override suspend fun getGifsForSearchQuery(query: String, page: Int) = withContext(Dispatchers.IO) {
+        getGifs(SEARCH_URL.format(config.getApiKey(), query, page))
     }
 
     private fun getGifs(url: String): List<Gif> {
@@ -58,7 +58,7 @@ class GifRemoteDataSource(
     }
 
     companion object {
-        private const val TRENDING_URL = "https://api.giphy.com/v1/gifs/trending?api_key=%s&limit=25"
-        private const val SEARCH_URL = "https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=25"
+        private const val TRENDING_URL = "https://api.giphy.com/v1/gifs/trending?api_key=%s&limit=25&offset=%s"
+        private const val SEARCH_URL = "https://api.giphy.com/v1/gifs/search?api_key=%s&q=%s&limit=25&offset=%s"
     }
 }

@@ -1,6 +1,7 @@
 package com.arthurzettler.gifgallery.ui.fragment.trending
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
@@ -20,6 +21,7 @@ import com.arthurzettler.gifgallery.ui.fragment.GifViewModel
 class TrendingFragment : Fragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var progressIndicatorView: ProgressBar
     private lateinit var errorView: ViewGroup
     private lateinit var retryButton: Button
@@ -77,9 +79,16 @@ class TrendingFragment : Fragment(), GifListInteraction {
         errorView = view.findViewById(R.id.error_layout)
         progressIndicatorView = view.findViewById(R.id.progress_indicator)
         recyclerView = view.findViewById<RecyclerView>(R.id.gif_list).apply {
-            layoutManager = LinearLayoutManager(context)
+            linearLayoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = GifListAdapter(context, gifList, this@TrendingFragment)
             itemAnimator = null
+            addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    handleListScroll()
+                    super.onScrolled(recyclerView, dx, dy)
+                }
+            })
         }
         retryButton = view.findViewById<Button>(R.id.retry_button).apply {
             setOnClickListener { loadGifList() }
@@ -152,6 +161,12 @@ class TrendingFragment : Fragment(), GifListInteraction {
         if (query.isEmpty().not()) searchGifs(query)
         currentQuery = query
         return false
+    }
+
+    private fun handleListScroll() {
+        if (linearLayoutManager.findLastVisibleItemPosition() == linearLayoutManager.itemCount - 5) {
+            viewModel.paginate(currentQuery)
+        }
     }
 
     companion object: DefaultFragmentCreator {

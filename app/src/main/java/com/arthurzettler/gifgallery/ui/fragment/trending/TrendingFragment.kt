@@ -1,9 +1,7 @@
 package com.arthurzettler.gifgallery.ui.fragment.trending
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.SearchView
@@ -13,12 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arthurzettler.gifgallery.R
 import com.arthurzettler.gifgallery.data.Gif
-import com.arthurzettler.gifgallery.ui.fragment.DefaultFragmentCreator
-import com.arthurzettler.gifgallery.ui.fragment.GifListAdapter
-import com.arthurzettler.gifgallery.ui.fragment.GifListInteraction
-import com.arthurzettler.gifgallery.ui.fragment.GifViewModel
+import com.arthurzettler.gifgallery.ui.fragment.*
+import java.nio.ByteBuffer
 
-class TrendingFragment : Fragment(), GifListInteraction {
+
+class TrendingFragment : ShareFragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -57,6 +54,8 @@ class TrendingFragment : Fragment(), GifListInteraction {
         viewModel.notifyFavoriteGifListObserver()
         recyclerView.adapter?.notifyItemChanged(gifList.indexOf(gif))
     }
+
+    override fun onShareGif(gif: ByteBuffer) { shareGif(gif) }
 
     private fun setupSearchMenu(inflater: MenuInflater, menu: Menu) {
         inflater.inflate(R.menu.options_menu, menu)

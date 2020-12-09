@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,12 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.arthurzettler.gifgallery.R
 import com.arthurzettler.gifgallery.data.Gif
-import com.arthurzettler.gifgallery.ui.fragment.DefaultFragmentCreator
-import com.arthurzettler.gifgallery.ui.fragment.GifListAdapter
-import com.arthurzettler.gifgallery.ui.fragment.GifListInteraction
-import com.arthurzettler.gifgallery.ui.fragment.GifViewModel
+import com.arthurzettler.gifgallery.ui.fragment.*
+import java.nio.ByteBuffer
 
-class FavoriteFragment : Fragment(), GifListInteraction {
+class FavoriteFragment : ShareFragment(), GifListInteraction {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var favoriteMessageView: ViewGroup
@@ -51,6 +48,8 @@ class FavoriteFragment : Fragment(), GifListInteraction {
 
         setViewVisibility(favoriteGifList.size != 0)
     }
+
+    override fun onShareGif(gif: ByteBuffer) { shareGif(gif) }
 
     private fun setupView(view: View) {
         favoriteMessageView = view.findViewById(R.id.favorite_message_layout)

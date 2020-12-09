@@ -10,6 +10,7 @@ import com.arthurzettler.gifgallery.R
 import com.arthurzettler.gifgallery.data.Gif
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.gif.GifDrawable
 
 class GifListAdapter(
         private val context: Context,
@@ -35,9 +36,8 @@ class GifListAdapter(
         val gif = gifList[position]
 
         holder.gifFavoriteButton.isSelected = gif.isFavorited
-        holder.gifFavoriteButton.setOnClickListener { view ->
-            interaction.onGifFavoriteStatusChanged(gif, view?.isSelected?.not() ?: false)
-        }
+        holder.gifFavoriteButton.setOnClickListener { handleClick(gif, it) }
+        holder.gifContainerView.setOnLongClickListener { handleLongClick(holder) }
 
         Glide.with(context)
             .asGif()
@@ -45,5 +45,16 @@ class GifListAdapter(
             .placeholder(R.drawable.ic_animated_progress_indicator)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(holder.gifContainerView)
+    }
+
+    private fun handleClick(gif: Gif, view: View) {
+        interaction.onGifFavoriteStatusChanged(gif, view.isSelected.not())
+    }
+
+    private fun handleLongClick(holder: ViewHolder): Boolean {
+        (holder.gifContainerView.drawable as? GifDrawable)?.let {
+            interaction.onShareGif(it.buffer)
+        }
+        return true
     }
 }
